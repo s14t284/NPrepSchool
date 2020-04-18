@@ -33,6 +33,23 @@ assessmentButton.onclick = () => {
   const result = assessment(userName);
   paragraph.innerText = result;
   resultDivided.appendChild(paragraph);
+
+  removeAllChildren(tweetDivided);
+  const anchor = document.createElement("a");
+  const hrefValue =
+    "https://twitter.com/intent/tweet?button_hashtag=" +
+    encodeURIComponent("あなたのいいところ") +
+    "&ref_src=twsrc%5Etfw";
+  anchor.setAttribute("href", hrefValue);
+  anchor.className = "twitter-hashtag-button";
+  anchor.setAttribute("data-text", result);
+  anchor.innerText = "Tweet #あなたのいいところ";
+  tweetDivided.appendChild(anchor);
+
+  // widgets.js の設定
+  const script = document.createElement("script");
+  script.setAttribute("src", "https://platform.twitter.com/widgets.js");
+  tweetDivided.appendChild(script);
 };
 
 const answers = [
@@ -78,3 +95,9 @@ console.assert(
     "太郎のいいところは決断力です。太郎がする決断にいつも助けられる人がいます。",
   "診断結果の文言の特定の部分を名前に置き換える処理が正しくありません。"
 );
+
+userNameInput.onkeydown = (event) => {
+  if (event.key === "Enter") {
+    assessmentButton.onclick();
+  }
+};
