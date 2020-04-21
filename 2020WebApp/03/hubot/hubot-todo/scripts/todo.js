@@ -28,19 +28,21 @@ module.exports = (robot) => {
   });
   robot.respond(/list/i, (msg) => {
     const list = todo.list();
+    let msgStr;
     if (list.length === 0) {
-      const msgStr = "(TODO はありません)";
+      msgStr = "(TODO はありません)";
     } else {
-      const msgStr = list.join("\n");
+      msgStr = list.join("\n");
     }
     msg.send(msgStr);
   });
   robot.respond(/donelist/i, (msg) => {
     const doneList = todo.donelist();
+    let msgStr;
     if (doneList.length === 0) {
-      const msgStr = "(完了した TODO はありません)";
+      msgStr = "(完了した TODO はありません)";
     } else {
-      const msgStr = doneList.join("\n");
+      msgStr = doneList.join("\n");
     }
     msg.send(msgStr);
   });
