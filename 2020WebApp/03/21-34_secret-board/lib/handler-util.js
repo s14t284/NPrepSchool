@@ -9,9 +9,9 @@ function handleLogout(req, res) {
 
 function handleBadRequest(req, res) {
   res.writeHead(403, {
-    "Content-Type": "text/plain; charset=utf-8".
-  })
-  res.end("未対応のメソッドです")
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+  res.end("未対応のメソッドです");
 }
 
 function handleNotFound(req, res) {
@@ -20,7 +20,6 @@ function handleNotFound(req, res) {
   });
   res.end("ページが見つかりません");
 }
-
 
 module.exports = {
   handleLogout,
