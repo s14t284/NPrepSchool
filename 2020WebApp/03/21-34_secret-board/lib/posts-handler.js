@@ -1,6 +1,7 @@
 "use strict";
 const pug = require("pug");
 const Cookies = require("cookies");
+const moment = require("moment-timezone");
 const util = require("./handler-util");
 const Post = require("./posts");
 
@@ -16,7 +17,11 @@ function handle(req, res) {
         "Content-Type": "text/html; charset=utf-8",
       });
       Post.findAll().then((posts) => {
-        res.end(pug.renderFile("./views/posts.pug", { posts: posts }));
+        posts.forEach(post => {
+          post.content = post.content.replace(/\n/g, '<br>');
+          post.formattedCreatedAt = moment(post.createdAt).tz("Asia/Tokyo").format("YYYY年MM月DD日 HH時mm分ss秒");
+        });
+        res.end(pug.renderFile("./views/posts.pug", { posts: posts, user: req.user }));
       });
       break;
     case "POST":
@@ -48,6 +53,36 @@ function handle(req, res) {
   }
 }
 
+function handleDelete(req, res) {
+  switch(req.method) {
+    case "POST":
+      let body = []
+      req.on("data", (chunk) => {
+        body.push(chunk);
+      }).on("end", () => {
+        body = Buffer.concat(body).toString();
+        const decoded = decodeURIComponent(body);
+        const id = decoded.split("id=")[1];
+        Post.findByPk(id).then((post) => {
+          if (req.user === post.postedBy || req.user === 'admin') {
+            post.destroy().then(() => {
+              handleRedirectPosts(req, res);
+              console.info(
+                `削除されました: user: ${req.user}, ` +
+                  `remoteAddress: ${req.connection.remoteAddress}, ` +
+                  `userAgent: ${req.headers['user-agent']} `
+              );
+            });
+          }
+        });
+      });
+      break;
+    default:
+      util.handleBadRequest(req, res);
+      break;
+  }
+}
+
 function addTrackingCookie(cookies) {
   if (!cookies.get(trackingIdKey)) {
     const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
@@ -65,5 +100,5 @@ function handleRedirectPosts(req, res) {
 }
 
 module.exports = {
-  handle,
+  handle, handleDelete
 };
